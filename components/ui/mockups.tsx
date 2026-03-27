@@ -1,272 +1,530 @@
-// Realistic dark-theme SVG UI mockups for case study previews
+"use client";
+
+import { motion } from "framer-motion";
+
+// ─────────────────────────────────────────────────────────────
+// 1. DASHBOARD PREVIEW — live stats, animated chart, activity
+// ─────────────────────────────────────────────────────────────
+
+const chartPoints = [
+  [0, 70], [48, 55], [96, 62], [144, 42], [192, 48],
+  [240, 30], [288, 35], [336, 18], [384, 25], [432, 12],
+];
+const chartLine = chartPoints.map(([x, y]) => `${x},${y}`).join(" ");
+const chartArea = `0,80 ${chartLine} 432,80`;
+
+const stats = [
+  { label: "Total Users", value: 2847, suffix: "", color: "#6366f1", delta: "+12.5%" },
+  { label: "Revenue", value: 48.2, suffix: "k", prefix: "$", color: "#10b981", delta: "+8.1%" },
+  { label: "Uptime", value: 94.3, suffix: "%", color: "#f59e0b", delta: "+0.3%" },
+  { label: "Active", value: 1204, suffix: "", color: "#ec4899", delta: "-2.4%" },
+];
+
+const activityItems = [
+  { name: "Sarah K.", action: "signed up", color: "#10b981" },
+  { name: "Alex R.", action: "upgraded plan", color: "#6366f1" },
+  { name: "Mia T.", action: "exported data", color: "#f59e0b" },
+  { name: "James L.", action: "invited team", color: "#ec4899" },
+  { name: "Nora W.", action: "connected API", color: "#6366f1" },
+];
+
+function AnimatedCounter({ value, suffix = "", prefix = "", delay = 0 }: {
+  value: number; suffix?: string; prefix?: string; delay?: number;
+}) {
+  return (
+    <motion.span
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay, duration: 0.3 }}
+      className="tabular-nums"
+    >
+      {prefix}{typeof value === "number" && value % 1 !== 0 ? value.toFixed(1) : value.toLocaleString()}{suffix}
+    </motion.span>
+  );
+}
 
 export function DashboardMockup() {
   return (
-    <svg
-      viewBox="0 0 900 400"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-      aria-hidden="true"
-    >
-      {/* Background */}
-      <rect width="900" height="400" fill="#0a0a0f" />
-
+    <div className="w-full h-full bg-[#0a0a0f] flex text-[10px] font-sans overflow-hidden select-none" aria-hidden="true">
       {/* Sidebar */}
-      <rect width="180" height="400" fill="#111118" />
-      {/* Sidebar logo */}
-      <rect x="20" y="24" width="60" height="8" rx="4" fill="#6366f1" opacity="0.8" />
-      {/* Sidebar nav items */}
-      {[72, 100, 128, 156, 184].map((y, i) => (
-        <g key={y}>
-          <rect x="16" y={y} width="24" height="24" rx="6" fill={i === 0 ? "#6366f1" : "#1e1e2a"} />
-          <rect x="48" y={y + 8} width={i === 0 ? 72 : 56} height="8" rx="4" fill={i === 0 ? "#e8e8ed" : "#3f3f52"} />
-        </g>
-      ))}
-      {/* Avatar at bottom */}
-      <circle cx="28" cy="372" r="14" fill="#1e1e2a" />
-      <circle cx="28" cy="372" r="14" stroke="#6366f1" strokeWidth="1.5" />
-      <rect x="50" y="366" width="60" height="7" rx="3.5" fill="#3f3f52" />
-      <rect x="50" y="378" width="40" height="6" rx="3" fill="#2a2a38" />
+      <div className="w-[120px] shrink-0 bg-[#111118] border-r border-white/[0.04] flex flex-col py-3 px-2.5">
+        <div className="h-2 w-10 rounded bg-indigo-500/60 mb-5" />
+        {["Dashboard", "Analytics", "Users", "Settings"].map((item, i) => (
+          <div
+            key={item}
+            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md mb-0.5 ${
+              i === 0 ? "bg-indigo-500/15 text-indigo-300" : "text-[#4a4a5a]"
+            }`}
+          >
+            <div className={`w-3 h-3 rounded ${i === 0 ? "bg-indigo-500/40" : "bg-[#1e1e2a]"}`} />
+            <span className="text-[8px] truncate">{item}</span>
+          </div>
+        ))}
+      </div>
 
       {/* Main area */}
-      {/* Top bar */}
-      <rect x="180" y="0" width="720" height="52" fill="#0d0d14" />
-      <rect x="200" y="18" width="160" height="16" rx="8" fill="#1a1a24" />
-      <rect x="213" y="24" width="8" height="4" rx="2" fill="#3f3f52" />
-      <rect x="226" y="24" width="80" height="4" rx="2" fill="#3f3f52" />
-      {/* Top bar right: notification + avatar */}
-      <circle cx="836" cy="26" r="12" fill="#1a1a24" />
-      <circle cx="808" cy="26" r="12" fill="#1a1a24" />
-      <circle cx="861" cy="26" r="12" fill="#6366f1" />
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top bar */}
+        <div className="h-8 bg-[#0d0d14] border-b border-white/[0.04] flex items-center justify-between px-3 shrink-0">
+          <div className="w-20 h-3 rounded bg-[#1a1a24]" />
+          <div className="flex gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-[#1a1a24]" />
+            <div className="w-4 h-4 rounded-full bg-indigo-500/50" />
+          </div>
+        </div>
 
-      {/* Stats row */}
-      {[
-        { x: 196, color: "#6366f1", value: "2,847", label: "Total Users", delta: "+12.5%" },
-        { x: 382, color: "#10b981", value: "$48.2k", label: "Revenue", delta: "+8.1%" },
-        { x: 568, color: "#f59e0b", value: "94.3%", label: "Uptime", delta: "+0.3%" },
-        { x: 754, color: "#ec4899", value: "1,204", label: "Active Now", delta: "-2.4%" },
-      ].map(({ x, color, value, label, delta }) => (
-        <g key={x}>
-          <rect x={x} y="68" width="170" height="82" rx="10" fill="#111118" stroke="#1e1e2a" strokeWidth="1" />
-          <rect x={x + 12} y="80" width="20" height="20" rx="5" fill={color} opacity="0.15" />
-          <rect x={x + 16} y="85" width="12" height="10" rx="2" fill={color} opacity="0.6" />
-          <rect x={x + 12} y="108" width={60} height="10" rx="5" fill="#e8e8ed" />
-          <rect x={x + 12} y="124" width={80} height="7" rx="3.5" fill="#3f3f52" />
-          <rect x={x + 108} y="122" width={42} height="9" rx="4.5" fill={color} opacity="0.15" />
-          <rect x={x + 116} y="124" width={26} height="5" rx="2.5" fill={color} opacity="0.7" />
-        </g>
-      ))}
+        <div className="flex-1 p-3 overflow-hidden">
+          {/* Stats row */}
+          <div className="grid grid-cols-4 gap-2 mb-3">
+            {stats.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
+                className="bg-[#111118] border border-white/[0.04] rounded-lg p-2"
+              >
+                <div className="flex items-center gap-1 mb-1">
+                  <div className="w-2.5 h-2.5 rounded" style={{ background: stat.color, opacity: 0.2 }} />
+                  <span className="text-[7px] text-[#5c5c6b]">{stat.label}</span>
+                </div>
+                <div className="text-[13px] font-bold text-[#e8e8ed] leading-none mb-0.5">
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} prefix={stat.prefix || ""} delay={0.5 + i * 0.15} />
+                </div>
+                <div className="text-[7px] font-medium" style={{ color: stat.color }}>{stat.delta}</div>
+              </motion.div>
+            ))}
+          </div>
 
-      {/* Chart area */}
-      <rect x="196" y="164" width="368" height="220" rx="10" fill="#111118" stroke="#1e1e2a" strokeWidth="1" />
-      <rect x="212" y="180" width="100" height="10" rx="5" fill="#e8e8ed" />
-      <rect x="212" y="196" width="70" height="7" rx="3.5" fill="#3f3f52" />
-      {/* Chart lines (area chart) */}
-      <defs>
-        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M212 340 L212 290 Q240 270 268 280 Q296 290 324 260 Q352 230 380 240 Q408 250 436 220 Q464 190 492 210 Q520 230 548 200 L548 340 Z"
-        fill="url(#chartGrad)"
-      />
-      <path
-        d="M212 290 Q240 270 268 280 Q296 290 324 260 Q352 230 380 240 Q408 250 436 220 Q464 190 492 210 Q520 230 548 200"
-        stroke="#6366f1"
-        strokeWidth="2"
-        fill="none"
-      />
-      {/* Chart dots */}
-      {[[212,290],[268,280],[324,260],[380,240],[436,220],[492,210],[548,200]].map(([cx, cy]) => (
-        <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="3" fill="#6366f1" />
-      ))}
-      {/* X-axis labels */}
-      {["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((d, i) => (
-        <rect key={d} x={212 + i * 56} y="350" width={24} height="5" rx="2.5" fill="#2a2a38" />
-      ))}
+          {/* Chart + Activity */}
+          <div className="grid grid-cols-5 gap-2">
+            {/* Chart panel */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+              className="col-span-3 bg-[#111118] border border-white/[0.04] rounded-lg p-2.5"
+            >
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <div className="text-[9px] font-semibold text-[#e8e8ed]">Revenue Overview</div>
+                  <div className="text-[7px] text-[#5c5c6b]">Last 30 days</div>
+                </div>
+                <div className="flex gap-1">
+                  {["1W", "1M", "3M"].map((t, i) => (
+                    <div key={t} className={`text-[6px] px-1.5 py-0.5 rounded ${i === 1 ? "bg-indigo-500/20 text-indigo-300" : "text-[#4a4a5a]"}`}>{t}</div>
+                  ))}
+                </div>
+              </div>
 
-      {/* Right column: table */}
-      <rect x="578" y="164" width="306" height="220" rx="10" fill="#111118" stroke="#1e1e2a" strokeWidth="1" />
-      <rect x="594" y="180" width="80" height="10" rx="5" fill="#e8e8ed" />
-      {/* Table rows */}
-      {[0,1,2,3,4].map((i) => (
-        <g key={i}>
-          <rect x="594" y={206 + i * 34} width="274" height="28" rx="6" fill={i % 2 === 0 ? "#0d0d14" : "transparent"} />
-          <circle cx="608" cy={220 + i * 34} r="8" fill="#1e1e2a" />
-          <rect cx="608" cy={220 + i * 34} x="624" y={214 + i * 34} width={50 + (i % 3) * 15} height="7" rx="3.5" fill="#3f3f52" />
-          <rect x="624" y={222 + i * 34} width={35 + (i % 2) * 10} height="5" rx="2.5" fill="#2a2a38" />
-          <rect x={810 - (i % 3) * 10} y={215 + i * 34} width="40" height="9" rx="4.5" fill={["#6366f1","#10b981","#f59e0b","#6366f1","#10b981"][i]} opacity="0.15" />
-          <rect x={816 - (i % 3) * 10} y={217 + i * 34} width="28" height="5" rx="2.5" fill={["#6366f1","#10b981","#f59e0b","#6366f1","#10b981"][i]} opacity="0.7" />
-        </g>
-      ))}
-    </svg>
+              <svg viewBox="0 0 432 85" className="w-full" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="liveChartFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                {/* Grid lines */}
+                {[20, 40, 60].map(y => (
+                  <line key={y} x1="0" y1={y} x2="432" y2={y} stroke="#1e1e2a" strokeWidth="0.5" />
+                ))}
+                {/* Area */}
+                <motion.polygon
+                  points={chartArea}
+                  fill="url(#liveChartFill)"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2, duration: 0.8 }}
+                />
+                {/* Line — draws in */}
+                <motion.polyline
+                  points={chartLine}
+                  fill="none"
+                  stroke="#6366f1"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ delay: 1, duration: 1.5, ease: "easeOut" }}
+                  style={{ filter: "drop-shadow(0 0 3px rgba(99,102,241,0.5))" }}
+                />
+                {/* Data dots */}
+                {chartPoints.map(([x, y], i) => (
+                  <motion.circle
+                    key={i}
+                    cx={x} cy={y} r="2.5"
+                    fill="#6366f1"
+                    stroke="#0a0a0f"
+                    strokeWidth="1"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 1.2 + i * 0.1, duration: 0.3 }}
+                  />
+                ))}
+              </svg>
+            </motion.div>
+
+            {/* Activity feed */}
+            <div className="col-span-2 bg-[#111118] border border-white/[0.04] rounded-lg p-2.5 overflow-hidden">
+              <div className="text-[9px] font-semibold text-[#e8e8ed] mb-2">Recent Activity</div>
+              <div className="space-y-1.5">
+                {activityItems.map((item, i) => (
+                  <motion.div
+                    key={item.name}
+                    initial={{ opacity: 0, x: 12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1.4 + i * 0.15, duration: 0.4 }}
+                    className="flex items-center gap-1.5"
+                  >
+                    <div className="w-3.5 h-3.5 rounded-full shrink-0 flex items-center justify-center text-[5px] font-bold text-white" style={{ background: item.color + "30", color: item.color }}>
+                      {item.name[0]}
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[7px] text-[#c8c8d0] font-medium">{item.name} </span>
+                      <span className="text-[7px] text-[#5c5c6b]">{item.action}</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Mini progress bars */}
+              <div className="mt-2 pt-2 border-t border-white/[0.04]">
+                <div className="text-[7px] text-[#5c5c6b] mb-1">Goal Progress</div>
+                {[
+                  { label: "MRR", pct: 78, color: "#6366f1" },
+                  { label: "Users", pct: 62, color: "#10b981" },
+                ].map((bar) => (
+                  <div key={bar.label} className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[6px] text-[#5c5c6b] w-6">{bar.label}</span>
+                    <div className="flex-1 h-1 rounded-full bg-white/[0.04] overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ background: bar.color }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${bar.pct}%` }}
+                        transition={{ delay: 2, duration: 1, ease: "easeOut" }}
+                      />
+                    </div>
+                    <span className="text-[6px] font-medium" style={{ color: bar.color }}>{bar.pct}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
+
+// ─────────────────────────────────────────────────────────────
+// 2. LANDING PAGE PREVIEW — typing headline, CTA pulse, cards
+// ─────────────────────────────────────────────────────────────
 
 export function LandingPageMockup() {
   return (
-    <svg
-      viewBox="0 0 900 400"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-      aria-hidden="true"
-    >
-      <rect width="900" height="400" fill="#050507" />
-
+    <div className="w-full h-full bg-[#050507] text-[10px] font-sans overflow-hidden select-none relative" aria-hidden="true">
       {/* Nav */}
-      <rect width="900" height="48" fill="#0a0a0f" opacity="0.9" />
-      <rect x="40" y="16" width="60" height="14" rx="7" fill="#6366f1" opacity="0.8" />
-      <rect x="600" y="17" width="36" height="14" rx="7" fill="#1a1a24" />
-      <rect x="644" y="17" width="36" height="14" rx="7" fill="#1a1a24" />
-      <rect x="688" y="17" width="36" height="14" rx="7" fill="#1a1a24" />
-      <rect x="748" y="14" width="80" height="20" rx="10" fill="#6366f1" />
+      <div className="h-8 bg-[#0a0a0f]/90 flex items-center justify-between px-6 border-b border-white/[0.03]">
+        <div className="w-10 h-2.5 rounded bg-indigo-500/60" />
+        <div className="flex items-center gap-3">
+          {["Features", "Pricing", "Docs"].map(t => (
+            <div key={t} className="text-[7px] text-[#5c5c6b]">{t}</div>
+          ))}
+          <div className="bg-indigo-500 text-white text-[7px] px-2 py-0.5 rounded-full font-medium">Get Started</div>
+        </div>
+      </div>
 
-      {/* Hero headline */}
-      <rect x="200" y="72" width="500" height="28" rx="8" fill="#e8e8ed" opacity="0.9" />
-      <rect x="260" y="108" width="380" height="20" rx="6" fill="#6366f1" opacity="0.7" />
-      <rect x="240" y="140" width="420" height="10" rx="5" fill="#3f3f52" />
-      <rect x="280" y="156" width="340" height="10" rx="5" fill="#3f3f52" />
+      {/* Hero area */}
+      <div className="flex flex-col items-center pt-6 px-4">
+        {/* Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="text-[6px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full mb-3"
+        >
+          Now in public beta
+        </motion.div>
 
-      {/* CTAs */}
-      <rect x="270" y="180" width="140" height="36" rx="18" fill="#6366f1" />
-      <rect x="425" y="180" width="140" height="36" rx="18" fill="#1a1a24" stroke="#2a2a38" strokeWidth="1" />
-      <rect x="303" y="194" width="74" height="8" rx="4" fill="#fff" opacity="0.9" />
-      <rect x="456" y="194" width="78" height="8" rx="4" fill="#e8e8ed" opacity="0.5" />
+        {/* Headline with typing cursor */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="text-center mb-2"
+        >
+          <div className="text-[16px] font-bold text-[#e8e8ed] leading-tight">
+            Ship faster with AI
+          </div>
+          <div className="text-[16px] font-bold leading-tight flex items-center justify-center gap-0.5">
+            <span className="text-indigo-400">powered analytics</span>
+            <motion.span
+              animate={{ opacity: [1, 0, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+              className="inline-block w-[1px] h-[14px] bg-indigo-400 ml-0.5"
+            />
+          </div>
+        </motion.div>
 
-      {/* Social proof / logos strip */}
-      <rect x="40" y="240" width="820" height="1" fill="#1e1e2a" />
-      <rect x="140" y="258" width="80" height="12" rx="6" fill="#1e1e2a" />
-      <rect x="280" y="258" width="80" height="12" rx="6" fill="#1e1e2a" />
-      <rect x="420" y="258" width="80" height="12" rx="6" fill="#1e1e2a" />
-      <rect x="560" y="258" width="80" height="12" rx="6" fill="#1e1e2a" />
-      <rect x="700" y="258" width="80" height="12" rx="6" fill="#1e1e2a" />
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+          className="text-[7px] text-[#5c5c6b] text-center max-w-[220px] leading-relaxed mb-3"
+        >
+          Understand your users, predict churn, and grow revenue — all from one dashboard.
+        </motion.p>
 
-      {/* Feature cards */}
-      {[0, 1, 2].map((i) => (
-        <g key={i}>
-          <rect x={80 + i * 260} y="290" width="220" height="90" rx="12" fill="#111118" stroke="#1e1e2a" strokeWidth="1" />
-          <rect x={100 + i * 260} y="308" width="28" height="28" rx="8" fill="#6366f1" opacity="0.15" />
-          <rect x={108 + i * 260} y="316" width="12" height="12" rx="3" fill="#6366f1" opacity="0.6" />
-          <rect x={100 + i * 260} y="344" width={100 + i * 10} height="8" rx="4" fill="#e8e8ed" opacity="0.7" />
-          <rect x={100 + i * 260} y="358" width={140 - i * 10} height="7" rx="3.5" fill="#3f3f52" />
-        </g>
-      ))}
-    </svg>
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9, duration: 0.5 }}
+          className="flex gap-2 mb-4"
+        >
+          <div className="relative">
+            <div className="bg-indigo-500 text-white text-[7px] px-3 py-1 rounded-full font-medium relative z-10">
+              Start Free Trial
+            </div>
+            {/* Pulse ring */}
+            <motion.div
+              animate={{ scale: [1, 1.4], opacity: [0.3, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute inset-0 rounded-full bg-indigo-500/30"
+            />
+          </div>
+          <div className="border border-white/10 text-[#c8c8d0] text-[7px] px-3 py-1 rounded-full">
+            Watch Demo
+          </div>
+        </motion.div>
+
+        {/* Social proof */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.1, duration: 0.5 }}
+          className="flex items-center gap-2 mb-4"
+        >
+          <div className="flex -space-x-1">
+            {["#6366f1", "#10b981", "#f59e0b", "#ec4899"].map((c, i) => (
+              <div key={i} className="w-3 h-3 rounded-full border border-[#050507]" style={{ background: c + "40" }} />
+            ))}
+          </div>
+          <span className="text-[6px] text-[#5c5c6b]">2,400+ teams trust us</span>
+        </motion.div>
+
+        {/* Feature cards — staggered reveal, loops */}
+        <div className="grid grid-cols-3 gap-2 w-full max-w-[360px]">
+          {[
+            { icon: "chart", title: "Real-time Analytics", desc: "Track every metric that matters" },
+            { icon: "bolt", title: "AI Predictions", desc: "Know what happens next" },
+            { icon: "shield", title: "Enterprise Ready", desc: "SOC2, GDPR, HIPAA" },
+          ].map((card, i) => (
+            <motion.div
+              key={card.title}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.3 + i * 0.2, duration: 0.5 }}
+              className="bg-[#111118] border border-white/[0.04] rounded-lg p-2 hover:border-indigo-500/20 transition-colors"
+            >
+              <div className="w-4 h-4 rounded bg-indigo-500/15 flex items-center justify-center mb-1.5">
+                <div className="w-2 h-2 rounded-sm bg-indigo-500/50" />
+              </div>
+              <div className="text-[7px] font-semibold text-[#e8e8ed] mb-0.5">{card.title}</div>
+              <div className="text-[6px] text-[#5c5c6b] leading-relaxed">{card.desc}</div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
+// ─────────────────────────────────────────────────────────────
+// 3. AI WRITING TOOL — typing cursor, AI bubbles, suggestions
+// ─────────────────────────────────────────────────────────────
+
+const chatMessages = [
+  { role: "user" as const, text: "Make this paragraph more engaging" },
+  { role: "ai" as const, text: "Here's a revised version with stronger hooks..." },
+  { role: "user" as const, text: "Add a call to action at the end" },
+  { role: "ai" as const, text: "Done! I've added a compelling CTA..." },
+];
+
 export function AIWritingMockup() {
   return (
-    <svg
-      viewBox="0 0 900 400"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-      aria-hidden="true"
-    >
-      <rect width="900" height="400" fill="#080810" />
+    <div className="w-full h-full bg-[#080810] text-[10px] font-sans overflow-hidden select-none flex" aria-hidden="true">
+      {/* Sidebar — document list */}
+      <div className="w-[130px] shrink-0 bg-[#0d0d16] border-r border-white/[0.04] p-2.5 flex flex-col">
+        <div className="text-[8px] font-semibold text-indigo-400/70 mb-1">WriteAI</div>
+        <div className="text-[6px] text-[#3f3f52] mb-2">3 documents</div>
 
-      {/* Left sidebar — document list */}
-      <rect width="220" height="400" fill="#0d0d16" />
-      <rect x="16" y="16" width="80" height="10" rx="5" fill="#6366f1" opacity="0.7" />
-      <rect x="16" y="36" width="100" height="7" rx="3.5" fill="#2a2a38" />
-      {/* New doc button */}
-      <rect x="16" y="54" width="188" height="32" rx="8" fill="#6366f1" opacity="0.15" stroke="#6366f1" strokeWidth="1" strokeOpacity="0.3" />
-      <rect x="60" y="63" width="100" height="14" rx="4" fill="#6366f1" opacity="0.7" />
-      {/* Doc items */}
-      {[
-        { y: 100, active: true, w: 130 },
-        { y: 136, active: false, w: 100 },
-        { y: 172, active: false, w: 115 },
-        { y: 208, active: false, w: 90 },
-        { y: 244, active: false, w: 125 },
-      ].map(({ y, active, w }) => (
-        <g key={y}>
-          <rect x="10" y={y} width="200" height="28" rx="7" fill={active ? "#6366f1" : "transparent"} opacity={active ? 0.12 : 1} />
-          {active && <rect x="10" y={y} width="200" height="28" rx="7" stroke="#6366f1" strokeWidth="1" strokeOpacity="0.3" />}
-          <rect x="22" y={y + 10} width={w} height="7" rx="3.5" fill={active ? "#818cf8" : "#2a2a38"} />
-        </g>
-      ))}
+        {/* New doc button */}
+        <div className="border border-indigo-500/25 bg-indigo-500/8 rounded-md px-2 py-1.5 text-[7px] text-indigo-300 text-center mb-3 font-medium">
+          + New Document
+        </div>
 
-      {/* Main editor */}
-      <rect x="220" y="0" width="680" height="400" fill="#080810" />
-      {/* Toolbar */}
-      <rect x="220" y="0" width="680" height="44" fill="#0d0d16" />
-      {["B","I","U","H1","H2"].map((t, i) => (
-        <g key={t}>
-          <rect x={240 + i * 44} y="12" width="32" height="20" rx="5" fill={i === 0 ? "#6366f1" : "#1a1a24"} opacity={i === 0 ? 0.3 : 1} />
-          <rect x={248 + i * 44} y="18" width="16" height="8" rx="2" fill={i === 0 ? "#818cf8" : "#3f3f52"} />
-        </g>
-      ))}
-      {/* Word count */}
-      <rect x="760" y="16" width="60" height="12" rx="6" fill="#1a1a24" />
-      <rect x="766" y="20" width="48" height="4" rx="2" fill="#3f3f52" />
+        {/* Doc list */}
+        {[
+          { title: "Product Launch Blog", active: true },
+          { title: "Email Campaign", active: false },
+          { title: "Landing Page Copy", active: false },
+        ].map((doc, i) => (
+          <motion.div
+            key={doc.title}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 + i * 0.1, duration: 0.4 }}
+            className={`px-2 py-1.5 rounded-md mb-0.5 ${
+              doc.active
+                ? "bg-indigo-500/10 border border-indigo-500/20"
+                : ""
+            }`}
+          >
+            <div className={`text-[7px] truncate ${doc.active ? "text-indigo-300" : "text-[#3f3f52]"}`}>
+              {doc.title}
+            </div>
+          </motion.div>
+        ))}
+      </div>
 
-      {/* Editor content */}
-      {/* Title */}
-      <rect x="260" y="68" width="360" height="22" rx="5" fill="#e8e8ed" opacity="0.9" />
-      {/* Paragraph lines */}
-      {[0,1,2,3].map((i) => (
-        <rect key={i} x="260" y={106 + i * 20} width={480 - (i === 3 ? 180 : 0)} height="10" rx="5" fill="#3f3f52" opacity="0.7" />
-      ))}
+      {/* Editor */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Toolbar */}
+        <div className="h-7 bg-[#0d0d16] border-b border-white/[0.04] flex items-center px-3 gap-1.5 shrink-0">
+          {["B", "I", "U", "H1", "H2"].map((t, i) => (
+            <div key={t} className={`text-[7px] w-4 h-4 flex items-center justify-center rounded ${i === 0 ? "bg-indigo-500/25 text-indigo-300" : "text-[#3f3f52]"}`}>
+              {t}
+            </div>
+          ))}
+          <div className="ml-auto text-[6px] text-[#3f3f52]">1,247 words</div>
+        </div>
 
-      {/* AI suggestion bubble */}
-      <rect x="260" y="186" width="420" height="80" rx="10" fill="#6366f1" fillOpacity="0.06" stroke="#6366f1" strokeWidth="1" strokeOpacity="0.2" />
-      <rect x="276" y="200" width="60" height="8" rx="4" fill="#818cf8" opacity="0.5" />
-      {/* AI suggestion text lines */}
-      <rect x="276" y="216" width="380" height="8" rx="4" fill="#818cf8" opacity="0.25" />
-      <rect x="276" y="230" width="340" height="8" rx="4" fill="#818cf8" opacity="0.25" />
-      <rect x="276" y="244" width="200" height="8" rx="4" fill="#818cf8" opacity="0.25" />
-      {/* Accept/dismiss buttons */}
-      <rect x="540" y="246" width="64" height="20" rx="10" fill="#6366f1" opacity="0.8" />
-      <rect x="612" y="246" width="52" height="20" rx="10" fill="#1a1a24" />
-      <rect x="556" y="252" width="32" height="8" rx="4" fill="#fff" opacity="0.8" />
-      <rect x="624" y="252" width="28" height="8" rx="4" fill="#3f3f52" />
+        {/* Content area */}
+        <div className="flex-1 p-4 overflow-hidden">
+          {/* Title */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="text-[14px] font-bold text-[#e8e8ed] mb-3"
+          >
+            How AI is Transforming Content Creation
+          </motion.div>
 
-      {/* More content lines */}
-      {[0,1,2].map((i) => (
-        <rect key={i} x="260" y={284 + i * 20} width={460 - (i === 2 ? 220 : 0)} height="10" rx="5" fill="#3f3f52" opacity="0.5" />
-      ))}
+          {/* Paragraph lines */}
+          {[0, 1, 2].map(i => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 + i * 0.08, duration: 0.4 }}
+              className="h-1.5 rounded bg-[#3f3f52]/60 mb-1.5"
+              style={{ width: `${85 - i * 12}%` }}
+            />
+          ))}
 
-      {/* AI chat panel on right */}
-      <rect x="680" y="44" width="220" height="356" fill="#0d0d16" />
-      <rect x="694" y="56" width="60" height="9" rx="4.5" fill="#818cf8" opacity="0.5" />
-      {/* Chat bubbles */}
-      {[
-        { y: 78, w: 140, right: false },
-        { y: 114, w: 160, right: true },
-        { y: 150, w: 130, right: false },
-        { y: 186, w: 150, right: true },
-      ].map(({ y, w, right }) => (
-        <g key={y}>
-          <rect
-            x={right ? 844 - w : 694}
-            y={y}
-            width={w}
-            height={30}
-            rx="8"
-            fill={right ? "#6366f1" : "#1a1a24"}
-            opacity={right ? 0.7 : 1}
-          />
-          <rect
-            x={right ? 850 - w : 700}
-            y={y + 11}
-            width={w - 12}
-            height={8}
-            rx="4"
-            fill={right ? "#fff" : "#3f3f52"}
-            opacity={right ? 0.8 : 1}
-          />
-        </g>
-      ))}
-      {/* Input */}
-      <rect x="688" y="360" width="192" height="32" rx="8" fill="#1a1a24" stroke="#2a2a38" strokeWidth="1" />
-      <rect x="700" y="372" width="140" height="8" rx="4" fill="#2a2a38" />
-      <rect x="856" y="366" width="20" height="20" rx="5" fill="#6366f1" opacity="0.6" />
-    </svg>
+          {/* AI suggestion bubble */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2, duration: 0.6 }}
+            className="mt-3 border border-indigo-500/20 bg-indigo-500/[0.04] rounded-lg p-2.5"
+          >
+            <div className="flex items-center gap-1 mb-1.5">
+              <div className="w-2.5 h-2.5 rounded bg-indigo-500/30 flex items-center justify-center">
+                <div className="w-1 h-1 rounded-full bg-indigo-400" />
+              </div>
+              <span className="text-[7px] text-indigo-300/60 font-medium">AI Suggestion</span>
+            </div>
+            {/* Suggestion text with shimmer */}
+            {[0, 1, 2].map(i => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0.15, 0.3, 0.15] }}
+                transition={{ delay: 1.5 + i * 0.1, duration: 2, repeat: Infinity }}
+                className="h-1 rounded bg-indigo-400/30 mb-1"
+                style={{ width: `${90 - i * 20}%` }}
+              />
+            ))}
+            {/* Accept / dismiss */}
+            <div className="flex gap-1.5 mt-2">
+              <motion.div
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="bg-indigo-500/70 text-white text-[6px] px-2 py-0.5 rounded-full font-medium"
+              >
+                Accept
+              </motion.div>
+              <div className="bg-[#1a1a24] text-[#5c5c6b] text-[6px] px-2 py-0.5 rounded-full">Dismiss</div>
+            </div>
+          </motion.div>
+
+          {/* More text lines */}
+          <div className="mt-3 space-y-1.5">
+            {[0, 1].map(i => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.8 + i * 0.1, duration: 0.4 }}
+                className="h-1.5 rounded bg-[#3f3f52]/40"
+                style={{ width: `${75 - i * 25}%` }}
+              />
+            ))}
+            {/* Typing cursor */}
+            <div className="flex items-center">
+              <div className="h-1.5 rounded bg-[#3f3f52]/40 w-[30%]" />
+              <motion.div
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{ duration: 0.8, repeat: Infinity }}
+                className="w-[1px] h-3 bg-indigo-400 ml-0.5"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* AI Chat panel */}
+      <div className="w-[140px] shrink-0 bg-[#0d0d16] border-l border-white/[0.04] flex flex-col">
+        <div className="px-2.5 py-2 border-b border-white/[0.04]">
+          <div className="text-[8px] font-semibold text-indigo-300/60">AI Assistant</div>
+        </div>
+
+        <div className="flex-1 p-2 overflow-hidden space-y-1.5">
+          {chatMessages.map((msg, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 + i * 0.3, duration: 0.4 }}
+              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[110px] px-2 py-1 rounded-lg text-[6px] leading-relaxed ${
+                  msg.role === "user"
+                    ? "bg-indigo-500/60 text-white/90"
+                    : "bg-[#1a1a24] text-[#8a8a9a]"
+                }`}
+              >
+                {msg.text}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Input */}
+        <div className="p-2 border-t border-white/[0.04]">
+          <div className="flex items-center bg-[#1a1a24] border border-white/[0.06] rounded-md px-2 py-1">
+            <span className="text-[6px] text-[#3f3f52] flex-1">Ask AI anything...</span>
+            <div className="w-3 h-3 rounded bg-indigo-500/50" />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

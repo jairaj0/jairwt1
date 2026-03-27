@@ -52,11 +52,20 @@ export default function Navbar() {
     <nav
       ref={navRef}
       style={{ opacity: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ${
-        scrolled ? "glass" : "bg-transparent"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50"
     >
-      <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
+      {/* Glass overlay — opacity-only fade, no color transitions, no flicker */}
+      <div
+        className="absolute inset-0 transition-opacity duration-500 pointer-events-none"
+        style={{
+          opacity: scrolled ? 1 : 0,
+          background: "rgba(6, 6, 10, 0.82)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+        }}
+      />
+      <div className="relative z-10 mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
         {/* Logo — scrolls to top */}
         <button
           onClick={() => {
@@ -115,7 +124,13 @@ export default function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden overflow-hidden border-t border-border glass"
+            className="relative z-10 md:hidden overflow-hidden"
+            style={{
+              background: "rgba(6, 6, 10, 0.92)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+              borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+            }}
           >
             <div className="flex flex-col gap-1 px-6 py-6">
               {links.map((link) => (

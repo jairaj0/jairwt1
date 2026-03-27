@@ -104,7 +104,7 @@ export default function Hero() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <div className="hero-cta opacity-0 w-full sm:w-auto">
-            <GlowButton href="#contact" cursorText="Chat" className="w-full sm:w-auto">
+            <GlowButton href="https://calendly.com/jairwt" external cursorText="Book" className="w-full sm:w-auto">
               Book a Call
             </GlowButton>
           </div>

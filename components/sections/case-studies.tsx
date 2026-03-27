@@ -175,7 +175,7 @@ export default function CaseStudies() {
             Want results like these for your product?
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <GlowButton href="#contact">Start a Project</GlowButton>
+            <GlowButton href="https://calendly.com/jairwt" external>Start a Project</GlowButton>
             <GlowButton href="#services" variant="secondary">
               See All Services
             </GlowButton>

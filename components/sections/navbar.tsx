@@ -75,7 +75,7 @@ export default function Navbar() {
           className="text-lg font-semibold tracking-tight"
         >
           <span className="text-accent-light">jai</span>
-          <span className="text-text-muted">.dev</span>
+          <span className="text-text-muted">.rwt</span>
         </button>
 
         {/* Desktop links */}

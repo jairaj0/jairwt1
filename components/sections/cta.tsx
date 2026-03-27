@@ -62,14 +62,14 @@ export default function CTA() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <GlowButton
-            href="https://calendly.com"
+            href="https://calendly.com/jairwt"
             external
             cursorText="Book"
           >
             Book a Free Call
           </GlowButton>
           <GlowButton
-            href="https://wa.me/"
+            href="https://wa.me/918789528633"
             variant="secondary"
             external
             cursorText="Chat"
@@ -77,7 +77,7 @@ export default function CTA() {
             WhatsApp Me
           </GlowButton>
           <GlowButton
-            href="https://fiverr.com"
+            href="https://www.fiverr.com/blockweb?public_mode=true"
             variant="secondary"
             external
             cursorText="Hire"

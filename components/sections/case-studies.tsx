@@ -1,9 +1,17 @@
 "use client";
 
-import Reveal from "@/components/animations/reveal";
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionHeading from "@/components/ui/section-heading";
 import GlowButton from "@/components/ui/glow-button";
-import { DashboardMockup, LandingPageMockup, AIWritingMockup } from "@/components/ui/mockups";
+import {
+  DashboardMockup,
+  LandingPageMockup,
+  AIWritingMockup,
+} from "@/components/ui/mockups";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const projects = [
   {
@@ -59,10 +67,132 @@ const projects = [
   },
 ];
 
-export default function CaseStudies() {
+/* ─── Lazy-mount mockup when scrolled into view ────────────── */
+function MockupContainer({ Mockup }: { Mockup: React.ComponentType }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setMounted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.05, rootMargin: "50px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="work" className="py-24 sm:py-32 relative">
-      <div className="mx-auto max-w-6xl px-6">
+    <div
+      ref={ref}
+      className="rounded-xl overflow-hidden border border-border bg-[#080810] mb-6"
+    >
+      <div className="aspect-video sm:aspect-[16/9] lg:aspect-[16/8] transform scale-[0.99] sm:scale-100 origin-center">
+        {mounted ? <Mockup /> : <div className="w-full h-full" />}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Animated count-up for result metrics ─────────────────── */
+function AnimatedMetric({ value }: { value: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [display, setDisplay] = useState(value);
+  const animated = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const match = value.match(/^([^0-9]*)([0-9,.]+)(.*)$/);
+    if (!match) return; // non-numeric like "Series A"
+
+    const [, prefix, numStr, suffix] = match;
+    const target = parseFloat(numStr.replace(/,/g, ""));
+    const hasDecimal = numStr.includes(".");
+    const decimals = hasDecimal ? numStr.split(".")[1].length : 0;
+    const hasComma = numStr.includes(",");
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !animated.current) {
+          animated.current = true;
+          const obj = { val: 0 };
+          gsap.to(obj, {
+            val: target,
+            duration: 1.8,
+            ease: "power2.out",
+            onUpdate: () => {
+              let formatted = hasDecimal
+                ? obj.val.toFixed(decimals)
+                : Math.round(obj.val).toString();
+              if (hasComma) {
+                formatted = Number(formatted).toLocaleString("en-US", {
+                  minimumFractionDigits: decimals,
+                  maximumFractionDigits: decimals,
+                });
+              }
+              setDisplay(`${prefix}${formatted}${suffix}`);
+            },
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [value]);
+
+  return <div ref={ref}>{display}</div>;
+}
+
+/* ─── Main Component ───────────────────────────────────────── */
+export default function CaseStudies() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    const grid = gridRef.current;
+    if (!section || !grid) return;
+
+    const ctx = gsap.context(() => {
+      const cards = grid.querySelectorAll<HTMLElement>(".work-card");
+      gsap.set(cards, { y: 80, opacity: 0 });
+
+      ScrollTrigger.create({
+        trigger: grid,
+        start: "top 80%",
+        once: true,
+        onEnter: () => {
+          gsap.to(cards, {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.2,
+            ease: "power3.out",
+          });
+        },
+      });
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section
+      ref={sectionRef}
+      id="work"
+      className="py-20 sm:py-24 md:py-32 relative"
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-12 lg:px-20">
         <SectionHeading
           label="Selected Work"
           title={
@@ -73,109 +203,113 @@ export default function CaseStudies() {
             </>
           }
           description="Every project is a story of transformation. Here's how I helped clients turn struggling products into growth engines."
-          className="mb-16"
+          className="mb-12 sm:mb-16"
         />
 
-        <div className="space-y-20">
-          {projects.map((project, i) => {
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+        >
+          {projects.map((project) => {
             const { Mockup } = project;
             return (
-              <Reveal key={project.title} delay={0}>
-                <article className={`group relative rounded-2xl border border-border bg-surface/20 overflow-hidden transition-all duration-500 hover:border-border-light`}>
-                  {/* Subtle hover gradient */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${project.accentFrom} ${project.accentTo} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+              <article
+                key={project.title}
+                className="work-card group relative rounded-2xl border border-border bg-surface/20 overflow-hidden transition-all duration-500 hover:border-border-light flex flex-col"
+              >
+                {/* Hover gradient */}
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${project.accentFrom} ${project.accentTo} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`}
+                />
 
-                  <div className="relative p-8 sm:p-10">
-                    {/* Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-8">
-                      <span className="text-xs font-semibold uppercase tracking-widest text-accent-light bg-accent/10 border border-accent/15 px-3 py-1 rounded-full w-fit">
-                        {project.category}
-                      </span>
-                      <h3 className="text-2xl sm:text-3xl font-bold">
-                        {project.title}
-                      </h3>
-                    </div>
+                <div className="relative p-5 sm:p-6 flex flex-col flex-1">
+                  {/* Header */}
+                  <div className="mb-5">
+                    <span className="inline-block text-[10px] font-semibold uppercase tracking-widest text-accent-light bg-accent/10 border border-accent/15 px-2.5 py-0.5 rounded-full mb-3">
+                      {project.category}
+                    </span>
+                    <h3 className="text-lg sm:text-xl lg:text-lg font-bold leading-tight">
+                      {project.title}
+                    </h3>
+                  </div>
 
-                    {/* Problem / Solution */}
-                    <div className="grid lg:grid-cols-2 gap-8 mb-8">
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-1.5 h-1.5 rounded-full bg-red-400/70 shrink-0" />
-                          <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-                            The Problem
-                          </h4>
-                        </div>
-                        <p className="text-text-secondary text-sm leading-relaxed">
-                          {project.problem}
-                        </p>
+                  {/* Mockup — lazy mounted on scroll */}
+                  <MockupContainer Mockup={Mockup} />
+
+                  {/* Problem / Solution — always stacked in grid */}
+                  <div className="space-y-4 mb-5">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-400/70 shrink-0" />
+                        <h4 className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                          The Problem
+                        </h4>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/70 shrink-0" />
-                          <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-                            The Solution
-                          </h4>
-                        </div>
-                        <p className="text-text-secondary text-sm leading-relaxed">
-                          {project.solution}
-                        </p>
-                      </div>
+                      <p className="text-text-secondary text-xs leading-relaxed line-clamp-3">
+                        {project.problem}
+                      </p>
                     </div>
-
-                    {/* SVG Mockup */}
-                    <div className="rounded-xl overflow-hidden border border-border mb-8 bg-[#080810]">
-                      <div className="aspect-[16/7]">
-                        <Mockup />
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/70 shrink-0" />
+                        <h4 className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                          The Solution
+                        </h4>
                       </div>
+                      <p className="text-text-secondary text-xs leading-relaxed line-clamp-3">
+                        {project.solution}
+                      </p>
                     </div>
+                  </div>
 
-                    {/* Results */}
-                    <div className="mb-6">
-                      <h4 className="text-xs font-semibold text-accent-light uppercase tracking-wider mb-4">
-                        The Results
-                      </h4>
-                      <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                        {project.results.map((r) => (
-                          <div
-                            key={r.label}
-                            className="text-center p-4 rounded-xl bg-accent/[0.04] border border-accent/10"
-                          >
-                            <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">
-                              {r.metric}
-                            </div>
-                            <div className="text-xs text-text-muted leading-snug">
-                              {r.label}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Tech */}
-                    <div className="flex flex-wrap gap-2">
-                      {project.tech.map((t) => (
-                        <span
-                          key={t}
-                          className="text-xs px-3 py-1 rounded-full bg-surface-light border border-border text-text-secondary"
+                  {/* Results */}
+                  <div className="mb-5 mt-auto">
+                    <h4 className="text-[10px] font-semibold text-accent-light uppercase tracking-wider mb-3">
+                      The Results
+                    </h4>
+                    <div className="grid grid-cols-3 gap-2">
+                      {project.results.map((r) => (
+                        <div
+                          key={r.label}
+                          className="text-center p-2.5 sm:p-3 rounded-lg bg-accent/[0.04] border border-accent/10"
                         >
-                          {t}
-                        </span>
+                          <div className="text-base sm:text-lg lg:text-base font-bold text-foreground mb-0.5">
+                            <AnimatedMetric value={r.metric} />
+                          </div>
+                          <div className="text-[9px] sm:text-[10px] text-text-muted leading-snug">
+                            {r.label}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
-                </article>
-              </Reveal>
+
+                  {/* Tech */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {project.tech.map((t) => (
+                      <span
+                        key={t}
+                        className="text-[10px] px-2 py-0.5 rounded-full bg-surface-light border border-border text-text-secondary"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </article>
             );
           })}
         </div>
 
         {/* Mid-page CTA */}
-        <div className="mt-16 text-center">
+        <div className="mt-12 sm:mt-16 text-center">
           <p className="text-text-secondary mb-6">
             Want results like these for your product?
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <GlowButton href="https://calendly.com/jairwt" external>Start a Project</GlowButton>
+            <GlowButton href="https://calendly.com/jairwt" external>
+              Start a Project
+            </GlowButton>
             <GlowButton href="#services" variant="secondary">
               See All Services
             </GlowButton>

@@ -42,8 +42,8 @@ const activityItems = [
 export function DashboardMockup() {
   return (
     <div className="w-full h-full bg-[#0a0a0f] flex text-[10px] font-sans overflow-hidden select-none" aria-hidden="true">
-      {/* Sidebar */}
-      <div className="w-[120px] shrink-0 bg-[#111118] border-r border-white/[0.04] flex flex-col py-3 px-2.5">
+      {/* Sidebar — percentage width for responsive scaling */}
+      <div className="w-[28%] max-w-[120px] shrink-0 bg-[#111118] border-r border-white/[0.04] flex flex-col py-3 px-2.5">
         <div className="h-2 w-10 rounded bg-indigo-500/60 mb-5" />
         {["Dashboard", "Analytics", "Users", "Settings"].map((item, i) => (
           <div
@@ -418,8 +418,8 @@ const chatMessages = [
 export function AIWritingMockup() {
   return (
     <div className="w-full h-full bg-[#080810] text-[10px] font-sans overflow-hidden select-none flex" aria-hidden="true">
-      {/* Sidebar — document list */}
-      <div className="w-[130px] shrink-0 bg-[#0d0d16] border-r border-white/[0.04] p-2.5 flex flex-col">
+      {/* Sidebar — document list — percentage width for responsive scaling */}
+      <div className="w-[26%] max-w-[130px] shrink-0 bg-[#0d0d16] border-r border-white/[0.04] p-2.5 flex flex-col">
         <div className="text-[8px] font-semibold text-indigo-400/70 mb-1">WriteAI</div>
         <div className="text-[6px] text-[#3f3f52] mb-2">3 documents</div>
 
@@ -553,8 +553,8 @@ export function AIWritingMockup() {
         </div>
       </div>
 
-      {/* AI Chat panel */}
-      <div className="w-[140px] shrink-0 bg-[#0d0d16] border-l border-white/[0.04] flex flex-col">
+      {/* AI Chat panel — percentage width for responsive scaling */}
+      <div className="w-[28%] max-w-[140px] shrink-0 bg-[#0d0d16] border-l border-white/[0.04] flex flex-col">
         <div className="px-2.5 py-2 border-b border-white/[0.04]">
           <div className="text-[8px] font-semibold text-indigo-300/60">AI Assistant</div>
         </div>
